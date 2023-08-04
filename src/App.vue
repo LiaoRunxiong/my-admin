@@ -1,9 +1,11 @@
 <template>
-  <nav>
-    <router-link to="/">Home</router-link> |
-    <router-link to="/about">About</router-link>
-  </nav>
-  <router-view/>
+  <div>
+    <!-- <nav>
+      <router-link to="/">Home22</router-link> |
+      <router-link to="/about">About</router-link>
+    </nav> -->
+    <router-view />
+  </div>
 </template>
 
 <style lang="less">
@@ -26,5 +28,17 @@ nav {
       color: #42b983;
     }
   }
+}
+
+div {
+  box-sizing: border-box;
+}
+
+//组件内滚动页面
+.main {
+  width: 100%;
+  max-height: calc(100vh - 180px);
+  overflow: auto;
+  padding: 24px;
 }
 </style>

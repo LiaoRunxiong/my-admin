@@ -1,25 +1,46 @@
-import { createRouter, createWebHistory } from 'vue-router'
-import HomeView from '../views/HomeView.vue'
+import { createRouter, createWebHistory } from "vue-router";
+import Layout from "@/layout/index";
+import { setupRouterGuards } from "./guards";
 
 const routes = [
   {
-    path: '/',
-    name: 'home',
-    component: HomeView
+    path: "/",
+    component: Layout,
+    redirect: "/dashboard",
+    hidden: true,
+    meta: { title: "首页", affix: true, icon: "dashboard" },
+    children: [
+      {
+        name: "dashboard",
+        path: "/dashboard",
+        component: () => import("@/views/Hello/index.vue"),
+        meta: { title: "首页", affix: true, icon: "dashboard" },
+      },
+    ],
   },
   {
-    path: '/about',
-    name: 'about',
+    path: "/about",
+    name: "about",
     // route level code-splitting
     // this generates a separate chunk (about.[hash].js) for this route
     // which is lazy-loaded when the route is visited.
-    component: () => import(/* webpackChunkName: "about" */ '../views/AboutView.vue')
-  }
-]
+    component: () => import("../views/AboutView.vue"),
+  },
+  {
+    path: "/login",
+    name: "login",
+    component: () => import("../views/sys/login/Login.vue"),
+  },
+];
 
-const router = createRouter({
+export const router = createRouter({
   history: createWebHistory(process.env.BASE_URL),
-  routes
-})
-
-export default router
+  routes,
+  // 是否应该禁止尾部斜杠。默认为假
+  // strict: true,
+  silent: true,
+});
+setupRouterGuards(router);
+export function setupRouter(app) {
+  app.use(router);
+}
