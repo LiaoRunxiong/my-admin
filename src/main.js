@@ -5,6 +5,9 @@ import { setupStore } from "./store";
 import Antd from "ant-design-vue";
 import { message } from "ant-design-vue";
 import "ant-design-vue/dist/antd.css";
+// import MyKeepAlive from "@/components/MyKeepAlive";
+// import KeepAliveImpl from "@/components/MyKeepAlive/keepalive";
+
 // import "ant-design-vue/dist/reset.css";
 const app = createApp(App);
 app.use(Antd);
@@ -51,3 +54,6 @@ message.config({
   rtl: false,
   //   prefixCls: "my-message",
 });
+
+// 注册全局组件
+// app.component("MyKeepAlive", KeepAliveImpl);

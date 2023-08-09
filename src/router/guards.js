@@ -37,7 +37,16 @@ export function setupRouterGuards(router) {
         //   ...to,
         //   replace: true,
         // });
-        // next(to.fullPath);
+
+        //刷新页面 动态添加路由后 matched还是空数组 ，重新路由一次
+        if (to.matched.length < 1) {
+          next({
+            ...to,
+            replace: true,
+          });
+        } else {
+          next();
+        }
       }
     }
   });

@@ -2,7 +2,7 @@ import axios from "axios";
 import { devUrl } from "@/config/url/index";
 import { message } from "ant-design-vue";
 import { useUser } from "@/hooks/useUser";
-import router from "@/router/index";
+import { router } from "@/router/index";
 
 console.log(3, devUrl.BASE_URL);
 
@@ -34,7 +34,6 @@ export function post(url, data) {
       throw new Error(error.response.data.error);
     });
 }
-
 http.interceptors.request.use(
   (config) => {
     console.log(9, config);
@@ -55,6 +54,8 @@ http.interceptors.response.use(
   (response) => {
     // 对响应数据做些什么
     console.log(49, response);
+    console.log(37, router);
+
     //code 200
     if (
       response.config.url.includes("/getVerifyCode") &&

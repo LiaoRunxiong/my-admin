@@ -1,0 +1,10 @@
+{
+  "ignore": [
+    "core-js",
+    "@vue/cli-plugin-babel",
+    "@vue/cli-plugin-router",
+    "@vue/cli-plugin-vuex",
+    "less-loader",
+    "less"
+  ]
+}

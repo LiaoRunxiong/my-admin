@@ -29,6 +29,9 @@
         }"
       >
         <router-view v-slot="{ Component }">
+          <!-- <MyKeepAlive>
+            <component :is="Component" />
+          </MyKeepAlive> -->
           <keep-alive>
             <component :is="Component" />
           </keep-alive>
@@ -77,7 +80,7 @@ export default defineComponent({
     const route = useRoute();
     const router = useRouter();
 
-    console.log(75, route,router.getRoutes());
+    console.log(75, route, router.getRoutes());
     function filterHidden(arr) {
       if (arr.length < 1) {
         return [];
@@ -137,5 +140,4 @@ export default defineComponent({
     background: #fff;
   }
 }
-
 </style>
