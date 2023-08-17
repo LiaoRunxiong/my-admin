@@ -3,6 +3,7 @@ import { useUser } from "@/hooks/useUser";
 import { usePermission } from "@/hooks/usePermission";
 
 export function setupRouterGuards(router) {
+  let reload = true;
   // 全局前置守卫
   router.beforeEach(async (to, from, next) => {
     const state = useLocalStorage("my-admin-user", {});
@@ -38,8 +39,9 @@ export function setupRouterGuards(router) {
         //   replace: true,
         // });
 
-        //刷新页面 动态添加路由后 matched还是空数组 ，重新路由一次
-        if (to.matched.length < 1) {
+        //刷新页面 动态添加路由后 matched还是空数组 ，重新路由一次 reload防止其他不能匹配的路由造成 死循环
+        if (to.matched.length < 1 && reload) {
+          reload = false;
           next({
             ...to,
             replace: true,

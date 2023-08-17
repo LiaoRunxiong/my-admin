@@ -12,7 +12,6 @@ export function useScroll() {
   const scrollHandler = (e) => {
     scrollParam.value.x = e.target.scrollLeft;
     scrollParam.value.y = e.target.scrollTop;
-    console.log(112, getScrollParam.value);
   };
   const initScroll = (initDom) => {
     dom = initDom;

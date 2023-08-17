@@ -1,14 +1,15 @@
 <template>
   <div class="photo main">
-    <div>图案协同系统</div>
-    <div>图案协同系统</div>
-    <div>图案协同系统</div>
-    <div>图案协同系统</div>
-    <div>图案协同系统</div>
-    <div>图案协同系统</div>
-    <div>图案协同系统</div>
-    <div>图案协同系统</div>
-    <div>图案协同系统</div>
+    <a-button v-if="hasPermission('add')">测试权限的添加按钮</a-button>
+    <div>图案设计</div>
+    <div>图案设计</div>
+    <div>图案设计</div>
+    <div>图案设计</div>
+    <div>图案设计</div>
+    <div>图案设计</div>
+    <div>图案设计</div>
+    <div>图案设计</div>
+    <div>图案设计</div>
     <div ref="tableRef">
       <a-table :columns="columns" :data-source="data" :scroll="{ x: true }">
         <template #bodyCell="{ column }">
@@ -32,12 +33,14 @@ import {
   onUnmounted,
 } from "vue";
 import { useScroll } from "@/hooks/useScroll";
+import { usePermission } from "@/hooks/usePermission";
 import { useTableFixed } from "@/hooks/useTableFixed";
 
 export default {
-  name: "Photo",
+  name: "visualGraphicDesign",
   components: {},
   setup() {
+    const { hasPermission } = usePermission();
     let scrollEl = null;
     let pageScrollEl = null;
     const tableRef = ref(null);
@@ -150,6 +153,7 @@ export default {
       data,
       columns,
       tableRef,
+      hasPermission,
     };
   },
 };

@@ -1,57 +1,210 @@
-// 定义一个全局缓存对象，用于存储组件实例
-const cache = {};
+import { cloneDeep } from "lodash-es";
+function isDef(v) {
+  return v !== undefined && v !== null;
+}
 
-// 自定义keep-alive组件
-const MyKeepAlive = {
-  name: "MyKeepAlive",
-  abstract: true,
-  props: {
-    // 定义缓存的组件名
-    include: [String, RegExp],
-    // 定义不缓存的组件名
-    exclude: [String, RegExp],
-  },
-  render() {
-    const { default: component } = this.$slots;
-    console.log(16, this.$slots);
-    const key = component.key;
-
-    // 判断是否需要缓存该组件
-    const shouldCache = this.shouldCacheComponent(key);
-
-    // 如果缓存中存在组件实例，则直接返回缓存的实例
-    if (shouldCache && cache[key]) {
-      return cache[key];
+/**
+ * Remove an item from an array.
+ */
+function remove(arr, item) {
+  if (arr.length) {
+    const index = arr.indexOf(item);
+    if (index > -1) {
+      return arr.splice(index, 1);
     }
+  }
+}
+function isRegExp(v) {
+  const _toString = Object.prototype.toString;
+  return _toString.call(v) === "[object RegExp]";
+}
 
-    // 否则，将组件实例存入缓存，并返回组件的虚拟节点
-    if (shouldCache) {
-      cache[key] = component;
-    }
-    return component;
-  },
-  methods: {
-    // 判断组件是否应该被缓存
-    shouldCacheComponent(key) {
-      const { include, exclude } = this;
-      if (include && !this.matches(include, key)) {
-        return false;
-      }
-      if (exclude && this.matches(exclude, key)) {
-        return false;
-      }
+const patternTypes = [String, RegExp, Array];
+
+function matches(pattern, name) {
+  if (Array.isArray(pattern)) {
+    if (pattern.indexOf(name) > -1) {
       return true;
-    },
-    // 判断组件名是否匹配
-    matches(pattern, key) {
-      if (typeof pattern === "string") {
-        return pattern.split(",").indexOf(key) > -1;
-      } else if (pattern instanceof RegExp) {
-        return pattern.test(key);
+    } else {
+      for (const item of pattern) {
+        if (isRegExp(item) && item.test(name)) {
+          return true;
+        }
       }
       return false;
+    }
+  } else if (typeof pattern === "string") {
+    return pattern.split(",").indexOf(name) > -1;
+  } else if (isRegExp(pattern)) {
+    return pattern.test(name);
+  }
+  /* istanbul ignore next */
+  return false;
+}
+
+function getComponentName(opts) {
+  return opts && (opts.Ctor.options.name || opts.tag);
+}
+
+function getComponentKey(vnode) {
+  console.log(58, vnode);
+  const { type } = vnode;
+  return !type.name ? type.__scopeId : type.name;
+}
+
+function getFirstComponentChild(children) {
+  if (Array.isArray(children)) {
+    for (let i = 0; i < children.length; i++) {
+      const c = children[i];
+      console.log(61, children, c);
+      // if (isDef(c) && (isDef(c.componentOptions) || c.isAsyncPlaceholder)) {
+      //   return c;
+      // }
+      if (isDef(c) && isDef(c.ctx)) {
+        return c;
+      }
+    }
+  }
+}
+
+function pruneCache(keepAliveInstance, filter) {
+  const { cache, keys, _vnode } = keepAliveInstance;
+  for (const key in cache) {
+    const cachedNode = cache[key];
+    if (cachedNode) {
+      const name = getComponentName(cachedNode.componentOptions);
+      const componentKey = getComponentKey(cachedNode);
+      if (name && !filter(name, componentKey)) {
+        pruneCacheEntry(cache, key, keys, _vnode);
+      }
+    }
+  }
+}
+
+// 删除缓存
+function pruneCacheEntry2(cache, key, keys) {
+  const cached = cache[key];
+  if (cached) {
+    cached.componentInstance.$destroy();
+  }
+  cache[key] = null;
+  remove(keys, key);
+}
+
+function pruneCacheEntry(cache, key, keys, current) {
+  const cached = cache[key];
+  if (cached && (!current || cached.tag !== current.tag)) {
+    cached.componentInstance.$destroy();
+  }
+  cache[key] = null;
+  remove(keys, key);
+}
+
+export default {
+  name: "AKeepAlive",
+  abstract: true,
+  model: {
+    prop: "clearCaches",
+    event: "clear",
+  },
+  props: {
+    include: patternTypes,
+    exclude: patternTypes,
+    excludeKeys: patternTypes,
+    max: [String, Number],
+    clearCaches: Array,
+  },
+  watch: {
+    clearCaches: function (val) {
+      if (val && val.length > 0) {
+        const { cache, keys } = this;
+        val.forEach((key) => {
+          pruneCacheEntry2(cache, key, keys);
+        });
+        this.$emit("clear", []);
+      }
     },
   },
-};
 
-export default MyKeepAlive;
+  created() {
+    this.cache = Object.create(null);
+    this.keys = [];
+  },
+
+  destroyed() {
+    for (const key in this.cache) {
+      pruneCacheEntry(this.cache, key, this.keys);
+    }
+  },
+
+  mounted() {
+    // 使用key来
+    this.$watch("include", (val) => {
+      pruneCache(this, (name, key) => matches(val, key));
+    });
+    this.$watch("exclude", (val) => {
+      pruneCache(this, (name, key) => !matches(val, key));
+    });
+    this.$watch("excludeKeys", (val) => {
+      pruneCache(this, (name, key) => !matches(val, key));
+    });
+  },
+
+  render() {
+    const slot = this.$slots.default();
+    // 获取keep-alive的第一个子节点（组件），这里要注意是第一个子节点，缓存存的也是这个子节点（组件）
+    let vnode = getFirstComponentChild(slot);
+    // 获取第一个子节点（组件）的配置信息
+
+    const type = vnode && vnode.type;
+    if (type) {
+      // check pattern
+      const componentKey = getComponentKey(vnode);
+      // const { include, exclude, excludeKeys } = this;
+      // if (
+      //   // not included
+      //   (include && (!componentKey || !matches(include, componentKey))) ||
+      //   // excluded
+      //   (exclude && componentKey && matches(exclude, componentKey)) ||
+      //   (excludeKeys && componentKey && matches(excludeKeys, componentKey))
+      // ) {
+      //   return vnode;
+      // }
+      // 判断是否存在缓存
+      
+      if (this.cache[componentKey]) {
+        console.log(176, componentKey);
+        // 如果已经存在，则使用缓存更新当前组件
+        vnode = this.cache[componentKey];
+        // vnode= this.cache[componentKey]
+        // 同时更新Key
+        // remove(this.keys, componentKey);
+        // this.keys.push(componentKey);
+      } else {
+        // 如果不存在，则直接存入cache
+        // 这里关注cache 和keys
+        // 因为我们后续需要操作这两个变量进行缓存删除
+        console.log(187, componentKey);
+        this.cache[componentKey] = vnode;
+        this.keys.push(componentKey);
+        // prune oldest entry
+        if (this.max && this.keys.length > parseInt(this.max)) {
+          pruneCacheEntry(this.cache, this.keys[0], this.keys, this._vnode);
+        }
+      }
+      console.log(
+        174,
+        vnode,
+        componentKey,
+        this.cache,
+        this.cache[componentKey],
+        this.cache[componentKey]?.component,
+        this.keys
+      );
+
+      // vnode.keepAlive = true;
+    }
+    console.log(205, vnode);
+    return vnode || (slot && slot[0]);
+  },
+};

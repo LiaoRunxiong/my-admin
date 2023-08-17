@@ -5,6 +5,7 @@ export function useFixed() {
   let dom = null;
   let copyDom = null;
   let pdom = null;
+  let fixedtop = 0;
   const scrollParam = ref({ x: 0, y: 0 });
   const getScrollParam = computed(() => {
     let obj = {};
@@ -15,7 +16,8 @@ export function useFixed() {
   const fixedHandler = (e) => {
     // 判断元素是否在可视区域内
     let isInViewport = false;
-    if (e.target.scrollTop >= dom.offsetTop) {
+    const rect = dom.getBoundingClientRect();
+    if (rect.top < 110 + fixedtop) {
       isInViewport = false;
     } else {
       isInViewport = true;
@@ -24,30 +26,33 @@ export function useFixed() {
     // 使用示例
     if (isInViewport) {
       if (!!copyDom) {
-        pdom.removeChild(copyDom);
+        // pdom.removeChild(copyDom);
+        dom.parentNode.removeChild(copyDom);
+
         copyDom = null;
       }
     } else {
       if (!copyDom) {
-        copyDom = dom.cloneNode(dom);
+        copyDom = dom.cloneNode(true);
         copyDom.style.position = "fixed";
+        // copyDom.style.lineHeight = "1.5715";
         copyDom.style["z-index"] = "10";
         // copyDom.style["width"] = "calc(100vw - 297px)";
         copyDom.style["width"] = pdom.clientWidth - 48 + "px";
-        // 200 + 80 + 17滚动条;
-        copyDom.style.top = 110 + "px";
-        pdom.appendChild(copyDom);
+        copyDom.style.top = 110 + fixedtop + "px";
+        // pdom.appendChild(copyDom);
+        dom.parentNode.appendChild(copyDom);
       }
     }
-
   };
 
-  const initFixed = (pDom, fixedDom) => {
+  const initFixed = (pDom = window, fixedDom, fixedTop = 0) => {
     // 头加tab=110px
     // pDom 参考元素
+    fixedtop = fixedTop;
     pdom = pDom;
     //参考滚动的元素添加定位 用于获取fixed元素正确的clientWidth
-    pDom.style.position = "relative";
+    // pDom.style.position = "relative";
     // pDom.style["overflow-y"] = "auto";
 
     dom = fixedDom;
@@ -57,10 +62,11 @@ export function useFixed() {
     // 创建 ResizeObserver 实例
     resizeObserver = new ResizeObserver((entries) => {
       for (const entry of entries) {
+        console.log(61, copyDom);
         // 获取元素的新宽度
         // const newWidth = entry.contentRect.width;
         if (!!copyDom) {
-          copyDom.style["width"] = pdom.clientWidth - 48 + "px";
+          copyDom.style["width"] = dom.parentNode.clientWidth - 48 + "px";
         }
       }
     });

@@ -6,7 +6,7 @@
       :trigger="null"
       collapsible
     >
-      <div class="logo" />
+      <div class="logo" @click="handleGo('/dashboard')">首页</div>
       <a-menu
         v-model:selectedKeys="selectedKeys"
         theme="light"
@@ -29,12 +29,12 @@
         }"
       >
         <router-view v-slot="{ Component }">
-          <!-- <MyKeepAlive>
+          <MyKeepAlive>
+            <component  :is="Component" />
+          </MyKeepAlive>
+          <!-- <keep-alive>
             <component :is="Component" />
-          </MyKeepAlive> -->
-          <keep-alive>
-            <component :is="Component" />
-          </keep-alive>
+          </keep-alive> -->
         </router-view>
       </a-layout-content>
       <a-layout-footer style="text-align: center">
@@ -101,12 +101,17 @@ export default defineComponent({
     const { getCollapsed } = useMenuSetting();
     const collapsed = getCollapsed;
     const open = (k) => {};
+    const handleGo = (path) => {
+      router.push(path);
+    };
+
     return {
       selectedKeys: ref([]),
       collapsed,
       allRoutes,
       route,
       open,
+      handleGo,
     };
   },
 });

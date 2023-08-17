@@ -5,7 +5,9 @@
     <div class="card">
       <a-row :gutter="[16, 16]">
         <a-col :span="4" v-for="(design, index) in designRoutes" :key="index">
-          <a-card> {{ design.meta.title }} </a-card>
+          <a-card @click="handleGo(design.path)">
+            {{ design.meta.title }}
+          </a-card>
         </a-col>
         <a-col :span="4">
           <a-card @click="handleGoStatistical"> 数量统计表 </a-card>
@@ -38,7 +40,7 @@ export default {
   name: "visualDesign",
   components: { Photo, Pattern },
   setup() {
-    let pageScrollEl = null
+    let pageScrollEl = null;
     const a = ref(true);
     const { getUser, logout } = useUser();
     const router = useRouter();
@@ -51,12 +53,14 @@ export default {
     const statisticalRoutes = allRoutes.children.filter((item) =>
       item.path.split("/").includes("statistical")
     );
-    console.log(23, designRoutes, statisticalRoutes);
+    console.log(54, designRoutes, statisticalRoutes);
     function handleLogout() {
       logout();
       router.push("/login");
     }
-    function handleGo() {}
+    function handleGo(path) {
+      router.push(path);
+    }
     function handleGoStatistical() {}
 
     // function getMatchedComponents() {

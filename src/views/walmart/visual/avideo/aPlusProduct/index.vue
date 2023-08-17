@@ -1,18 +1,6 @@
 <template>
-  <div class="pattern main" ref="pattern">
-    <div>图案设计统计</div>
-    <div>图案设计统计</div>
-    <div>图案设计统计</div>
-    <div>图案设计统计</div>
-    <div>图案设计统计</div>
-    <div>图案设计统计</div>
-    <div>图案设计统计</div>
-    <div>图案设计统计</div>
-    <div>图案设计统计</div>
-    <div>图案设计统计</div>
-    <div>图案设计统计</div>
-    <div>图案设计统计</div>
-
+  <div class="home">
+   <div>A+产品</div> 
     <!-- <img alt="Vue logo" src="@/assets/logo.png" />
         <HelloWorld msg="Welcome to Your Vue.js App" />{{ a }} -->
     拖拽时移动
@@ -52,130 +40,26 @@
       </li>
       <!-- Add more list items as needed -->
     </transition-group>
-    <div
-      style="padding: 10px; width: 100%; background-color: white"
-      ref="actionBar"
-    >
-      <div class="">操作栏</div>
-      <a-button>导出</a-button>
-      <a-button>批量</a-button>
-    </div>
-    表格
-    <div ref="tableRef">
-      <a-table :columns="columns" :data-source="data" :scroll="{ x: true }">
-        <template #bodyCell="{ column }">
-          <template v-if="column.key === 'operation'">
-            <a>action</a>
-          </template>
-        </template>
-      </a-table>
-    </div>
   </div>
 </template>
 
 <script>
 // @ is an alias to /src
-import {
-  nextTick,
-  onUnmounted,
-  ref,
-  onActivated,
-  onDeactivated,
-  onMounted,
-} from "vue";
+import HelloWorld from "@/components/HelloWorld.vue";
+import { nextTick, ref } from "vue";
 import { useUser } from "@/hooks/useUser";
 import { useRouter } from "vue-router";
-import { useFixed } from "@/hooks/useFixed";
-import { useScroll } from "@/hooks/useScroll";
+import { Button } from "ant-design-vue";
 export default {
-  name: "Pattern",
-  components: {},
+  name: "aPlusProduct",
+  components: {
+    HelloWorld,
+    "a-button": Button,
+  },
   setup() {
     const a = ref(1);
-    const actionBar = ref(null);
-    const pattern = ref(null);
-    const { initScroll, destoryScroll, restoreScroll } = useScroll();
-    const { initFixed, destoryFixed } = useFixed();
-    const { initFixed: initTableFixed, destoryFixed: destoryTableFixed } =
-      useFixed();
-    const tableRef = ref(null);
-
     const { getUser, logout } = useUser();
     const router = useRouter();
-    const columns = [
-      {
-        title: "Full Name",
-        width: 100,
-        dataIndex: "name",
-        key: "name",
-      },
-      {
-        title: "Age",
-        width: 100,
-        dataIndex: "age",
-        key: "age",
-      },
-      {
-        title: "Column 1",
-        dataIndex: "address",
-        key: "1",
-        width: 150,
-      },
-      {
-        title: "Column 2",
-        dataIndex: "address",
-        key: "2",
-        width: 150,
-      },
-      {
-        title: "Column 3",
-        dataIndex: "address",
-        key: "3",
-        width: 150,
-      },
-      {
-        title: "Column 4",
-        dataIndex: "address",
-        key: "4",
-        width: 150,
-      },
-      {
-        title: "Column 5",
-        dataIndex: "address",
-        key: "5",
-        width: 150,
-      },
-      {
-        title: "Column 6",
-        dataIndex: "address",
-        key: "6",
-        width: 150,
-      },
-      {
-        title: "Column 7",
-        dataIndex: "address",
-        key: "7",
-      },
-      {
-        title: "Column 8",
-        dataIndex: "address",
-        key: "8",
-      },
-      {
-        title: "Action",
-        key: "operation",
-        width: 100,
-      },
-    ];
-    const data = ref([]);
-    for (let i = 0; i < 100; i++) {
-      data.value.push({
-        key: i,
-        name: `Edrward ${i}`,
-        age: 32,
-        address: `London Park no. ${i}`,
-      });
-    }
     const list = ref([
       { label: "列表1" },
       { label: "列表2" },
@@ -204,7 +88,7 @@ export default {
       { label: "2列表11" },
       { label: "2列表12" },
     ]);
-
+    2;
     const dragIndex = ref("");
     const dragIndex2 = ref("");
     const enterIndex = ref("");
@@ -291,39 +175,6 @@ export default {
       logout();
       router.push("/login");
     }
-
-    onMounted(() => {
-      initScroll(pattern.value);
-      initTableFixed(
-        pattern.value,
-        tableRef.value.querySelector(".ant-table-thead"),
-        actionBar.value.clientHeight
-      );
-      console.log(
-        302,
-        actionBar.value.offsetTop,
-        actionBar.value.scrollY,
-        tableRef.value.querySelector(".ant-table-thead").offsetTop
-      );
-      initFixed(pattern.value, actionBar.value);
-    });
-    onUnmounted(() => {
-      destoryScroll();
-      destoryFixed();
-      destoryTableFixed();
-    });
-    onActivated(() => {
-      // 调用时机为首次挂载
-      // 以及每次从缓存中被重新插入时
-      restoreScroll();
-      console.log("active");
-    });
-
-    onDeactivated(() => {
-      // 在从 DOM 上移除、进入缓存
-      // 以及组件卸载时调用
-      console.log("deactive");
-    });
     return {
       a,
       handleLogout,
@@ -337,17 +188,17 @@ export default {
       dragover2,
       dragend2,
       drop2,
-      data,
-      columns,
       dragleave2,
-      actionBar,
-      tableRef,
-      pattern,
     };
   },
 };
 </script>
 <style scoped lang="less">
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
 .list {
   list-style: none;
   display: flex;

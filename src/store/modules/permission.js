@@ -11,7 +11,7 @@ export const usePermissonStore = defineStore("permisson", {
     return {
       originRouteList: [],
       menuRoutes: [],
-      buttonList: [],
+      buttonPermissions: [],
       roles: [],
       weChatId: "",
     };
@@ -23,6 +23,9 @@ export const usePermissonStore = defineStore("permisson", {
 
     getMenuRoutes() {
       return this.menuRoutes || [];
+    },
+    getButtonPermissions() {
+      return this.buttonPermissions || [];
     },
   },
   actions: {
@@ -74,7 +77,7 @@ export const usePermissonStore = defineStore("permisson", {
           obj.hidden = route.isHide;
           obj.meta = {
             title: route.name,
-            keepAlive:route.keepAlive,
+            keepAlive: route.keepAlive,
             icon: route.icon,
             resourceType: route.resourceType,
             id: route.id,
@@ -84,8 +87,9 @@ export const usePermissonStore = defineStore("permisson", {
             obj.children = [];
             parentArr.push(obj);
             // arr.splice(index, 1);
+          } else {
+            obj.children = generateRouteObj(route.children, arr2);
           }
-          obj.children = generateRouteObj(route.children, arr);
           arr2.push(obj);
         });
         // arr = arr.filter((item) => item !== false);
@@ -114,8 +118,8 @@ export const usePermissonStore = defineStore("permisson", {
     setOriginRouteList(value) {
       this.originRouteList = value || [];
     },
-    setButtonList(value) {
-      this.buttonList = value || [];
+    setButtonPermissions(value) {
+      this.buttonPermissions = value || [];
     },
     setRoles(value) {
       this.roles = value || [];
@@ -131,7 +135,7 @@ export const usePermissonStore = defineStore("permisson", {
           myToken: getUser.value.myToken,
         });
         this.setOriginRouteList(res.data.powers);
-        this.setButtonList(res.data.buttonKeys);
+        this.setButtonPermissions(res.data.buttonKeys);
         this.setRoles(res.data.roleNames);
         this.setWeChatId(res.data.weChatId);
         this.buildRoutes();
