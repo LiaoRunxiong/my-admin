@@ -4,10 +4,10 @@ import { message } from "ant-design-vue";
 import { useUser } from "@/hooks/useUser";
 import { router } from "@/router/index";
 
-console.log(3, devUrl.BASE_URL);
+console.log(3, process.env.VUE_APP_API_URL);
 
 const http = axios.create({
-  baseURL: devUrl.BASE_URL, // 设置你的API基本URL
+  baseURL: process.env.VUE_APP_API_URL, // 设置你的API基本URL
   // 可以在这里添加其他Axios配置选项
   timeout: 1000 * 20, // 两分钟
   headers: {

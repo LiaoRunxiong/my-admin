@@ -57,3 +57,10 @@ message.config({
 
 // 注册全局组件
 app.component("MyKeepAlive", MyKeepAlive);
+console.log(
+  60,
+  process.env.NODE_ENV,
+  process.env,
+  import.meta,
+  import.meta.env
+);

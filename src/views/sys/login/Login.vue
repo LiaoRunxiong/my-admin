@@ -67,6 +67,15 @@ export default {
   },
   props: {},
   setup() {
+    console.log(
+      71,
+      process.env.NODE_ENV,
+      process.env,
+      import.meta,
+      import.meta.env,
+      import.meta.url,
+      new URL(import.meta.url)
+    );
     const { loginbyPhone } = useUser();
     const loginForm = ref(null);
     const formState = reactive({
